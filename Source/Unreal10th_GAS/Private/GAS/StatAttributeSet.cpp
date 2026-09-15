@@ -7,6 +7,8 @@ UStatAttributeSet::UStatAttributeSet()
 {
     InitHealth(100.0f);
     InitMaxHealth(100.0f);
+    InitStamina(100.0f);
+    InitMaxStamina(100.0f);
 }
 
 void UStatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -18,9 +20,10 @@ void UStatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
         // Health가 변경되려고 해서 호출되었다.
         NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
     }
-    else if (Attribute == GetMaxHealthAttribute())
+    else if (Attribute == GetStaminaAttribute())
     {
-        // MaxHealth가 변경되려고 해서 호출되었다.
+        // Stamina가 변경되려고 해서 호출되었다.
+        NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxStamina());
     }
 }
 
@@ -31,6 +34,11 @@ void UStatAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute,
     if (Attribute == GetHealthAttribute())
     {
         UE_LOG(LogTemp, Log, TEXT("[UStatAttributeSet::PostAttributeChange()] : Health 변경됨 (%.1f) -> (%.1f)"),
+               OldValue, NewValue);
+    }
+    else if (Attribute == GetStaminaAttribute())
+    {
+        UE_LOG(LogTemp, Log, TEXT("[UStatAttributeSet::PostAttributeChange()] : Stamina 변경됨 (%.1f) -> (%.1f)"),
                OldValue, NewValue);
     }
 }

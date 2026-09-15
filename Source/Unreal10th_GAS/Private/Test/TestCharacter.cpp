@@ -34,8 +34,8 @@ void ATestCharacter::BeginPlay()
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
-		FOnGameplayAttributeValueChange& HealthChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UStatAttributeSet::GetHealthAttribute());
-		HealthChange.AddUObject(this, &ATestCharacter::OnHealthChanged);
+		//FOnGameplayAttributeValueChange& HealthChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UStatAttributeSet::GetHealthAttribute());
+		//HealthChange.AddUObject(this, &ATestCharacter::OnHealthChanged);
 	}
 }
 
@@ -59,3 +59,8 @@ void ATestCharacter::OnHealthChanged(const FOnAttributeChangeData& InData)
 		   InData.OldValue, InData.NewValue);
 }
 
+void ATestCharacter::OnStaminaChanged(const FOnAttributeChangeData& InData)
+{
+	UE_LOG(LogTemp, Log, TEXT("[ATestCharacter::OnStaminaChanged()] : Stamina 변경됨 (%.1f) -> (%.1f)"),
+		   InData.OldValue, InData.NewValue);
+}

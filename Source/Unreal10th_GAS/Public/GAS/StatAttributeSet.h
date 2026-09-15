@@ -26,7 +26,6 @@ public:
 	// 
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
-
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
 	FGameplayAttributeData Health;
@@ -35,5 +34,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, MaxHealth);
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
+	FGameplayAttributeData Stamina;
+	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, Stamina);
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
+	FGameplayAttributeData MaxStamina;
+	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, MaxStamina);
 
 };
