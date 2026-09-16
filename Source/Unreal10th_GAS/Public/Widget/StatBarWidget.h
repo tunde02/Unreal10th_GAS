@@ -16,31 +16,31 @@ struct FOnAttributeChangeData;
 UCLASS()
 class UNREAL10TH_GAS_API UStatBarWidget : public UUserWidget
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	void BindToAttribute(
-		UAbilitySystemComponent* InAbilitySystemComponent,
-		FGameplayAttribute InCurrentAttribute,
-		FGameplayAttribute InMaxAttribute);
+    void BindToAttribute(
+        UAbilitySystemComponent* InAbilitySystemComponent,
+        FGameplayAttribute InCurrentAttribute,
+        FGameplayAttribute InMaxAttribute);
 
 private:
-	void OnAttributeChanged(const FOnAttributeChangeData& InData);
-	void RefreshStatBar();
+    void OnAttributeChanged(const FOnAttributeChangeData& InData);
+    void RefreshStatBar();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<UProgressBar> StatProgressBar;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<UTextBlock> CurrentStatValue;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<UTextBlock> MaxStatValue;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
+    TObjectPtr<UProgressBar> StatProgressBar;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
+    TObjectPtr<UTextBlock> CurrentStatValue;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
+    TObjectPtr<UTextBlock> MaxStatValue;
 
 private:
-	TWeakObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-	FGameplayAttribute CurrentAttribute;
-	FGameplayAttribute MaxAttribute;
+    TWeakObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+    FGameplayAttribute CurrentAttribute;
+    FGameplayAttribute MaxAttribute;
 
 };

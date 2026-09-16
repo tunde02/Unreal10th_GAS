@@ -11,16 +11,16 @@ class UStatBarWidget;
 UCLASS()
 class UNREAL10TH_GAS_API UMainWidget : public UUserWidget
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	void BindToCharacter(ACharacter* InCharacter);
+    void BindToCharacter(ACharacter* InCharacter);
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<UStatBarWidget> HealthBarWidget;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
+    TObjectPtr<UStatBarWidget> HealthBarWidget;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<UStatBarWidget> StaminaBarWidget;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
+    TObjectPtr<UStatBarWidget> StaminaBarWidget;
 
 };

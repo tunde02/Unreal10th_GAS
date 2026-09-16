@@ -11,22 +11,22 @@ class ATestCharacter;
 UCLASS()
 class UNREAL10TH_GAS_API ATestBaseActor : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ATestBaseActor();
+    GENERATED_BODY()
+
+public:
+    // Sets default values for this actor's properties
+    ATestBaseActor();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Test")
-	TObjectPtr<ATestCharacter> Target;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
+    TObjectPtr<ATestCharacter> Target;
 
 };

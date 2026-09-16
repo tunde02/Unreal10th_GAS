@@ -2,65 +2,64 @@
 
 
 #include "Test/TestCharacter.h"
-#include "AbilitySystemComponent.h"
 #include "GAS/StatAttributeSet.h"
 
-// Sets default values
+#include "AbilitySystemComponent.h"
+
 ATestCharacter::ATestCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
 
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
-	StatAttributeSet = CreateDefaultSubobject<UStatAttributeSet>(TEXT("Stat"));
+    AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+    StatAttributeSet = CreateDefaultSubobject<UStatAttributeSet>(TEXT("Stat"));
 }
 
 UAbilitySystemComponent* ATestCharacter::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+    return AbilitySystemComponent;
 }
 
 UStatAttributeSet* ATestCharacter::GetStatAttribute() const
 {
-	return StatAttributeSet;
+    return StatAttributeSet;
 }
 
-// Called when the game starts or when spawned
 void ATestCharacter::BeginPlay()
 {
-	Super::BeginPlay();
-	
-	if (IsValid(AbilitySystemComponent))
-	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
-		//FOnGameplayAttributeValueChange& HealthChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UStatAttributeSet::GetHealthAttribute());
-		//HealthChange.AddUObject(this, &ATestCharacter::OnHealthChanged);
-	}
+    Super::BeginPlay();
 }
 
-// Called every frame
 void ATestCharacter::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
+    Super::Tick(DeltaTime);
 }
 
-// Called to bind functionality to input
 void ATestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ATestCharacter::OnHealthChanged(const FOnAttributeChangeData& InData)
+void ATestCharacter::PossessedBy(AController* NewController)
 {
-	UE_LOG(LogTemp, Log, TEXT("[ATestCharacter::OnHealthChanged()] : Health 변경됨 (%.1f) -> (%.1f)"),
-		   InData.OldValue, InData.NewValue);
+    Super::PossessedBy(NewController);
+
+    if (IsValid(AbilitySystemComponent))
+    {
+        AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+        //FOnGameplayAttributeValueChange& HealthChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UStatAttributeSet::GetHealthAttribute());
+        //HealthChange.AddUObject(this, &ATestCharacter::OnHealthChanged);
+    }
 }
 
-void ATestCharacter::OnStaminaChanged(const FOnAttributeChangeData& InData)
-{
-	UE_LOG(LogTemp, Log, TEXT("[ATestCharacter::OnStaminaChanged()] : Stamina 변경됨 (%.1f) -> (%.1f)"),
-		   InData.OldValue, InData.NewValue);
-}
+//void ATestCharacter::OnHealthChanged(const FOnAttributeChangeData& InData)
+//{
+//    UE_LOG(LogTemp, Log, TEXT("[ATestCharacter::OnHealthChanged()] : Health 변경됨 (%.1f) -> (%.1f)"),
+//           InData.OldValue, InData.NewValue);
+//}
+//
+//void ATestCharacter::OnStaminaChanged(const FOnAttributeChangeData& InData)
+//{
+//    UE_LOG(LogTemp, Log, TEXT("[ATestCharacter::OnStaminaChanged()] : Stamina 변경됨 (%.1f) -> (%.1f)"),
+//           InData.OldValue, InData.NewValue);
+//}

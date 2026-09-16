@@ -9,13 +9,13 @@
 UCLASS()
 class UNREAL10TH_GAS_API APlayerTestCharacter : public ATestCharacter
 {
-	GENERATED_BODY()
-	
-public:
-	UFUNCTION(BlueprintCallable)
-	void ModifyHealth(float InAmount);
+    GENERATED_BODY()
 
-	UFUNCTION(BlueprintCallable)
-	void ModifyStamina(float InAmount);
+public:
+    UFUNCTION(BlueprintCallable)
+    void ModifyHealth(float InAmount);
+
+    UFUNCTION(BlueprintCallable)
+    void ModifyStamina(float InAmount);
 
 };

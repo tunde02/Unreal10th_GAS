@@ -7,11 +7,11 @@
 #include "TestPlayerController.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class UNREAL10TH_GAS_API ATestPlayerController : public APlayerController
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 };

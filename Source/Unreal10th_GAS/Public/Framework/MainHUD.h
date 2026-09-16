@@ -11,17 +11,17 @@ class UMainWidget;
 UCLASS()
 class UNREAL10TH_GAS_API AMainHUD : public AHUD
 {
-	GENERATED_BODY()
-	
-protected:
-	virtual void BeginPlay() override;
+    GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UMainWidget> MainWidgetClass;
+    virtual void BeginPlay() override;
+
+protected:
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    TSubclassOf<UMainWidget> MainWidgetClass;
 
 private:
-	UPROPERTY()
-	TObjectPtr<UMainWidget> MainWidgetInstance;
+    UPROPERTY()
+    TObjectPtr<UMainWidget> MainWidgetInstance;
 
 };

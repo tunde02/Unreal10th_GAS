@@ -16,44 +16,44 @@ AEnemyTestCharacter::AEnemyTestCharacter()
 
 void AEnemyTestCharacter::ModifyHealth(float InAmount)
 {
-	if (!StatAttributeSet)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[AEnemyTestCharacter::ModifyHealth()] : StatAttributeSet가 nullptr입니다."));
-		return;
-	}
+    if (!StatAttributeSet)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[AEnemyTestCharacter::ModifyHealth()] : StatAttributeSet가 nullptr입니다."));
+        return;
+    }
 
-	const float NewHealth = StatAttributeSet->GetHealth() + InAmount;
-	StatAttributeSet->SetHealth(NewHealth);
+    const float NewHealth = StatAttributeSet->GetHealth() + InAmount;
+    StatAttributeSet->SetHealth(NewHealth);
 }
 
 void AEnemyTestCharacter::ModifyStamina(float InAmount)
 {
-	if (!StatAttributeSet)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[AEnemyTestCharacter::ModifyStamina()] : StatAttributeSet가 nullptr입니다."));
-		return;
-	}
+    if (!StatAttributeSet)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[AEnemyTestCharacter::ModifyStamina()] : StatAttributeSet가 nullptr입니다."));
+        return;
+    }
 
-	const float NewStamina = StatAttributeSet->GetStamina() + InAmount;
-	StatAttributeSet->SetStamina(NewStamina);
+    const float NewStamina = StatAttributeSet->GetStamina() + InAmount;
+    StatAttributeSet->SetStamina(NewStamina);
 }
 
 void AEnemyTestCharacter::BeginPlay()
 {
     Super::BeginPlay();
 
-	if (IsValid(AbilitySystemComponent))
-	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+    if (IsValid(AbilitySystemComponent))
+    {
+        AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
-		Cast<UHealthAndStaminaWidget>(WidgetComponent->GetWidget())->BindToAttribute(
-			AbilitySystemComponent,
-			UStatAttributeSet::GetHealthAttribute(),
-			UStatAttributeSet::GetMaxHealthAttribute(),
-			UStatAttributeSet::GetStaminaAttribute(),
-			UStatAttributeSet::GetMaxStaminaAttribute());
+        Cast<UHealthAndStaminaWidget>(WidgetComponent->GetWidget())->BindToAttribute(
+            AbilitySystemComponent,
+            UStatAttributeSet::GetHealthAttribute(),
+            UStatAttributeSet::GetMaxHealthAttribute(),
+            UStatAttributeSet::GetStaminaAttribute(),
+            UStatAttributeSet::GetMaxStaminaAttribute());
 
-		//FOnGameplayAttributeValueChange& HealthChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UStatAttributeSet::GetHealthAttribute());
-		//HealthChange.AddUObject(this, &ATestCharacter::OnHealthChanged);
-	}
+        //FOnGameplayAttributeValueChange& HealthChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UStatAttributeSet::GetHealthAttribute());
+        //HealthChange.AddUObject(this, &ATestCharacter::OnHealthChanged);
+    }
 }
