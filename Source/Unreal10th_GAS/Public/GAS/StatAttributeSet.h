@@ -5,16 +5,14 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
+#include "GameplayEffectExtension.h"
 #include "StatAttributeSet.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UNREAL10TH_GAS_API UStatAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
-	
+
 public:
 	UStatAttributeSet();
 
@@ -23,24 +21,39 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
 	// CurrentValue 변경 후에 실행되는 함수
-	// 
+	// 값의 변화 감지나, UI 반영을 위해 사용
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
+
+	// 이펙트가 적용된 후에 실행되는 함수
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, Health);
-	
+
 	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, MaxHealth);
-	
+
 	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
 	FGameplayAttributeData Stamina;
 	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, Stamina);
-	
+
 	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
 	FGameplayAttributeData MaxStamina;
 	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, MaxStamina);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
+	FGameplayAttributeData Defense;
+	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, Defense);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
+	FGameplayAttributeData Damage;
+	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, Damage);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
+	FGameplayAttributeData StaminaCost;
+	ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, StaminaCost);
 
 };

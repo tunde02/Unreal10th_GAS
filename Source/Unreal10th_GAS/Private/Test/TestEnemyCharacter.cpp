@@ -46,6 +46,7 @@ void ATestEnemyCharacter::InitializeOverHeadWidget()
     {
         if (UOverHeadWidget* OverHeadWidget = Cast<UOverHeadWidget>(UserWidget))
         {
+
             OverHeadWidget->InitializeWithAbilitySystem(this);
         }
     }
