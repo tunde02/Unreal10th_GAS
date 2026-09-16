@@ -6,9 +6,12 @@
 
 #include "Components/WidgetComponent.h"
 #include "AbilitySystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ATestEnemyCharacter::ATestEnemyCharacter()
 {
+    PrimaryActorTick.bCanEverTick = true;
+
     OverHeadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverHeadWidgetComponent"));
     OverHeadWidgetComponent->SetupAttachment(RootComponent);
     OverHeadWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
@@ -35,6 +38,16 @@ void ATestEnemyCharacter::PossessedBy(AController* NewController)
     //InitializeOverHeadWidget();
 }
 
+void ATestEnemyCharacter::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if (bFaceCamera)
+    {
+        UpdateOverHeadWidgetRotation();
+    }
+}
+
 void ATestEnemyCharacter::InitializeOverHeadWidget()
 {
     if (!OverHeadWidgetComponent)
@@ -49,5 +62,30 @@ void ATestEnemyCharacter::InitializeOverHeadWidget()
 
             OverHeadWidget->InitializeWithAbilitySystem(this);
         }
+    }
+}
+
+void ATestEnemyCharacter::UpdateOverHeadWidgetRotation()
+{
+    if (!OverHeadWidgetComponent)
+    {
+        return;
+    }
+
+    if (APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0))
+    {
+        FRotator WidgetRotation = (-CameraManager->GetCameraRotation().Vector()).Rotation();
+
+        if (bLockWidgetPitch)
+        {
+            WidgetRotation.Pitch = 0.0f;
+        }
+
+        if (bLockWidgetRoll)
+        {
+            WidgetRotation.Roll = 0.0f;
+        }
+
+        OverHeadWidgetComponent->SetWorldRotation(WidgetRotation);
     }
 }

@@ -19,12 +19,24 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void PossessedBy(AController* NewController) override;
+    virtual void Tick(float DeltaTime) override;
 
     UFUNCTION(BlueprintCallable)
     void InitializeOverHeadWidget();
 
+    void UpdateOverHeadWidgetRotation();
+
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "OverHead")
     TObjectPtr<UWidgetComponent> OverHeadWidgetComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI|OverHead")
+    bool bFaceCamera = true;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI|OverHead")
+    bool bLockWidgetPitch = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI|OverHead")
+    bool bLockWidgetRoll = true;
 
 };
