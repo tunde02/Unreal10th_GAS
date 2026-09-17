@@ -10,6 +10,12 @@ UStatAttributeSet::UStatAttributeSet()
 
     InitStamina(100.0f);
     InitMaxStamina(100.0f);
+
+    InitAttackPower(10.0f);
+    InitDefensePower(5.0f);
+
+    InitDamage(0.0f);
+    InitStaminaCost(0.0f);
 }
 
 void UStatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -28,7 +34,7 @@ void UStatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
     {
         NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxStamina());
     }
-    else if (Attribute == GetDefenseAttribute())
+    else if (Attribute == GetDefensePowerAttribute())
     {
         NewValue = FMath::Max(0.0f, NewValue);
     }
@@ -48,17 +54,7 @@ void UStatAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute,
         // 최대 체력이 증가하면 그 수치만큼 현재 체력도 증가한다
         // 최대 체력이 감소하면 최대 체력을 초과하는 만큼만 제거한다
 
-        const float CurrentHealth = GetHealth();
-        float NewHealth = CurrentHealth;
-
-        if (NewValue > OldValue)
-        {
-            NewHealth += NewValue - OldValue;
-        }
-
-        NewHealth = FMath::Clamp(NewHealth, 0.0f, NewValue);
-
-        SetHealth(NewHealth);
+        AdjustAttributeForMaxChange(OldValue, NewValue, GetHealthAttribute());
     }
     else if (Attribute == GetStaminaAttribute())
     {
@@ -74,13 +70,15 @@ void UStatAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
     if (Data.EvaluatedData.Attribute == GetDamageAttribute())
     {
         const float LocalDamage = GetDamage();
-        SetDamage(0.0f);
+        SetDamage(0.0f); // 메타 어트리뷰트는 사용했으면 비워야한다
 
         if (LocalDamage > 0)
         {
-            // 여기서 데미지에 대한 각종 계산 추가
+            // 여기서 대미지에 대한 각종 계산 추가
             // ex) 방어력, 최소 대미지, 쉴드 피해 증가 등
-            const float FinalDamage = FMath::Clamp(LocalDamage - GetDefense(), 0.0f, GetMaxHealth());
+            float FinalDamage = LocalDamage - GetDefensePower();
+            FinalDamage = FMath::Max(1.0f, FinalDamage); // 최소 대미지 보장
+
             const float NewHealth = FMath::Clamp(GetHealth() - FinalDamage, 0.0f, GetMaxHealth());
             SetHealth(NewHealth);
         }
@@ -92,9 +90,41 @@ void UStatAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
         if (LocalStaminaCost > 0)
         {
-            const float FinalStaminaCost = LocalStaminaCost;
+            float FinalStaminaCost = LocalStaminaCost;
+            FinalStaminaCost = FMath::Max(1.0f, FinalStaminaCost);
+
             const float NewStamina = FMath::Clamp(GetStamina() - FinalStaminaCost, 0.0f, GetMaxStamina());
             SetStamina(NewStamina);
+
+            // 스태미너가 0 이하가 되면 탈진 상태가 되는 등의 추가 처리
+        }
+    }
+}
+
+void UStatAttributeSet::AdjustAttributeForMaxChange(
+    float InOldMaxValue,
+    float InNewMaxValue,
+    const FGameplayAttribute& InAffectedAttributeProperty)
+{
+    UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent();
+    if (!ASC)
+    {
+        return;
+    }
+
+    float Delta = InNewMaxValue - InOldMaxValue;
+    if (Delta > 0)
+    {
+        ASC->ApplyModToAttributeUnsafe(InAffectedAttributeProperty, EGameplayModOp::Additive, Delta);
+    }
+    else
+    {
+        bool bFound = false;
+        const float Current = ASC->GetGameplayAttributeValue(InAffectedAttributeProperty, bFound);
+        if (InNewMaxValue < Current)
+        {
+            Delta = InNewMaxValue - Current;
+            ASC->ApplyModToAttributeUnsafe(InAffectedAttributeProperty, EGameplayModOp::Additive, Delta);
         }
     }
 }
