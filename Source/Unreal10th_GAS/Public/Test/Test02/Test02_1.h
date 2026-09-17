@@ -16,7 +16,7 @@ class UNREAL10TH_GAS_API ATest02_1 : public ATestBaseActor
 
 public:
     UFUNCTION(CallInEditor, Category = "GAS")
-    void ApplyGameplayEffect();
+    virtual void ApplyGameplayEffect();
 
     UFUNCTION(CallInEditor, Category = "GAS")
     void RemoveAllEffects();
