@@ -67,4 +67,8 @@ public:
     FGameplayAttributeData StaminaCost;
     ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, StaminaCost);
 
+    UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
+    FGameplayAttributeData CriticalChance;
+    ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, CriticalChance);
+
 };

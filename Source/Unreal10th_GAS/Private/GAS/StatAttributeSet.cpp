@@ -16,6 +16,8 @@ UStatAttributeSet::UStatAttributeSet()
 
     InitDamage(0.0f);
     InitStaminaCost(0.0f);
+
+    InitCriticalChance(0.3f);
 }
 
 void UStatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

@@ -12,15 +12,15 @@
 struct FDamageStatics
 {
     DECLARE_ATTRIBUTE_CAPTUREDEF(AttackPower);
-    DECLARE_ATTRIBUTE_CAPTUREDEF(DefensePower);
+    DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalChance);
 
     FDamageStatics()
     {
         // 소스의 공격력을 생성 시점 기준으로 캡쳐한다
         DEFINE_ATTRIBUTE_CAPTUREDEF(UStatAttributeSet, AttackPower, Source, true);
 
-        // 소스의 방어력을 피격 시점 기준으로 캡쳐한다
-        DEFINE_ATTRIBUTE_CAPTUREDEF(UStatAttributeSet, DefensePower, Target, false);
+        // 소스의 치명타 확률을 생성 시점 기준으로 캡쳐한다
+        DEFINE_ATTRIBUTE_CAPTUREDEF(UStatAttributeSet, CriticalChance, Source, true);
     }
 };
 
@@ -34,7 +34,7 @@ UMMC_Damage::UMMC_Damage()
 {
     // 어떤 어트리뷰트를 캡쳐할 것인지 지정
     RelevantAttributesToCapture.Add(DamageStatics().AttackPowerDef);
-    RelevantAttributesToCapture.Add(DamageStatics().DefensePowerDef);
+    RelevantAttributesToCapture.Add(DamageStatics().CriticalChanceDef);
 }
 
 //==================================================================================
@@ -43,13 +43,20 @@ float UMMC_Damage::CalculateBaseMagnitude_Implementation(const FGameplayEffectSp
 {
     FAggregatorEvaluateParameters EvalParams;
 
-    float Attack = 0.0f;
-    GetCapturedAttributeMagnitude(DamageStatics().AttackPowerDef, Spec, EvalParams, Attack);
+    float AttackPower = 0.0f;
+    GetCapturedAttributeMagnitude(DamageStatics().AttackPowerDef, Spec, EvalParams, AttackPower);
 
-    float Defense = 0.0f;
-    GetCapturedAttributeMagnitude(DamageStatics().DefensePowerDef, Spec, EvalParams, Defense);
+    float CriticalChance = 0.0f;
+    GetCapturedAttributeMagnitude(DamageStatics().CriticalChanceDef, Spec, EvalParams, CriticalChance);
 
-    float Damage = FMath::Max(1.0f, Attack - Defense);
+    float Damage = AttackPower;
+    const float RandomChance = FMath::RandRange(0.0f, 1.0f);
+
+    if (CriticalChance > RandomChance)
+    {
+        UE_LOG(LogTemp, Log, TEXT("크리티컬 발생! - 대미지 %.0f -> %.0f"), Damage, Damage * 2.0f);
+        Damage *= 2.0f;
+    }
 
     return Damage;
 }
