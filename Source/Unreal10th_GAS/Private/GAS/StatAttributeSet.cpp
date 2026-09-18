@@ -47,7 +47,7 @@ void UStatAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute,
 
     if (Attribute == GetHealthAttribute())
     {
-        UE_LOG(LogTemp, Log, TEXT("[UStatAttributeSet::PostAttributeChange()] : Health 변경됨 (%.1f) -> (%.1f)"),
+        UE_LOG(LogTemp, Log, TEXT("Health 변경됨 (%.1f) -> (%.1f)"),
                OldValue, NewValue);
     }
     else if (Attribute == GetMaxHealthAttribute())
