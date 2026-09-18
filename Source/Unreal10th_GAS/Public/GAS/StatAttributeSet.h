@@ -56,6 +56,10 @@ public:
     ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, AttackPower);
 
     UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
+    FGameplayAttributeData CriticalChance;
+    ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, CriticalChance);
+
+    UPROPERTY(BlueprintReadOnly, Category = "Base Stat")
     FGameplayAttributeData DefensePower;
     ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, DefensePower);
 
