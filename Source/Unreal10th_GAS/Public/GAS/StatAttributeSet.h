@@ -75,4 +75,12 @@ public:
     FGameplayAttributeData StaminaCost;
     ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, StaminaCost);
 
+    UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
+    FGameplayAttributeData JumpGauge;
+    ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, JumpGauge);
+
+    UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
+    FGameplayAttributeData MaxJumpGauge;
+    ATTRIBUTE_ACCESSORS_BASIC(UStatAttributeSet, MaxJumpGauge);
+
 };

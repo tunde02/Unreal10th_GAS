@@ -71,6 +71,12 @@ void ATestPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
             EnhancedInputComp->BindAction(SprintAction, ETriggerEvent::Started, this, &ATestPlayerCharacter::OnSprintInputStart);
             EnhancedInputComp->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATestPlayerCharacter::OnSprintInputCompleted);
         }
+
+        if (JumpAction)
+        {
+            EnhancedInputComp->BindAction(JumpAction, ETriggerEvent::Started, this, &ATestPlayerCharacter::OnJumpInputStart);
+            EnhancedInputComp->BindAction(JumpAction, ETriggerEvent::Completed, this, &ATestPlayerCharacter::OnJumpInputCompleted);
+        }
     }
 }
 
@@ -96,16 +102,38 @@ void ATestPlayerCharacter::Tick(float DeltaTime)
 
 void ATestPlayerCharacter::GiveDefaultAbilities()
 {
-    if (!AbilitySystemComponent) { return; }
-    if (!DefaultAbilityClass) { return; }
+    if (!AbilitySystemComponent || !AbilitySystemComponent->IsOwnerActorAuthoritative()) { return; }
 
     if (!AbilitySystemComponent->AbilityActorInfo.IsValid())
     {
         AbilitySystemComponent->InitAbilityActorInfo(this, this);
     }
 
-    FGameplayAbilitySpec Spec(DefaultAbilityClass, DefaultAbilityLevel, SPRINT_INPUT_ID);
-    FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
+    auto GiveIfMissing = [this](TSubclassOf<UGameplayAbility> AbilityClass, EDefaultAbilityInput Input)
+    {
+        if (!AbilityClass || AbilitySystemComponent->FindAbilitySpecFromClass(AbilityClass)) { return; }
+
+        int32 InputId = INDEX_NONE;
+        switch (Input)
+        {
+        case EDefaultAbilityInput::Sprint: InputId = SPRINT_INPUT_ID; break;
+        case EDefaultAbilityInput::Jump: InputId = JUMP_INPUT_ID; break;
+        default: break;
+        }
+
+        AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, DefaultAbilityLevel, InputId));
+    };
+
+    for (const FDefaultAbilityEntry& Entry : DefaultAbilities)
+    {
+        GiveIfMissing(Entry.AbilityClass, Entry.Input);
+    }
+
+    // 기존 블루프린트의 단일 어빌리티 설정을 계속 사용할 수 있게 한다.
+    if (DefaultAbilities.IsEmpty())
+    {
+        GiveIfMissing(DefaultAbilityClass, EDefaultAbilityInput::Sprint);
+    }
 }
 
 void ATestPlayerCharacter::OnSprintInputStart()
@@ -131,4 +159,33 @@ void ATestPlayerCharacter::OnMoveSpeedChanged(const FOnAttributeChangeData& InDa
         const float Ratio = InData.NewValue / 100.0f;
         MovementComp->MaxWalkSpeed = BaseWalkSpeed * Ratio;
     }
+}
+
+void ATestPlayerCharacter::OnJumpInputStart()
+{
+    if (AbilitySystemComponent)
+    {
+        if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+        {
+            MovementComp->JumpZVelocity = BaseJumpZVelocity;
+        }
+
+        AbilitySystemComponent->AbilityLocalInputPressed(JUMP_INPUT_ID);
+    }
+}
+
+void ATestPlayerCharacter::OnJumpInputCompleted()
+{
+    if (AbilitySystemComponent)
+    {
+        if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+        {
+            const float JumpGauge = AbilitySystemComponent->GetNumericAttribute(UStatAttributeSet::GetJumpGaugeAttribute());
+            MovementComp->JumpZVelocity += JumpGauge * 10.0f;
+        }
+
+        AbilitySystemComponent->AbilityLocalInputReleased(JUMP_INPUT_ID);
+    }
+
+    Jump();
 }

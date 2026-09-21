@@ -10,6 +10,27 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
+class UGameplayAbility;
+
+UENUM(BlueprintType)
+enum class EDefaultAbilityInput : uint8
+{
+    None,
+    Sprint,
+    Jump
+};
+
+USTRUCT(BlueprintType)
+struct FDefaultAbilityEntry
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+    TSubclassOf<UGameplayAbility> AbilityClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+    EDefaultAbilityInput Input = EDefaultAbilityInput::None;
+};
 
 UCLASS()
 class UNREAL10TH_GAS_API ATestPlayerCharacter : public ATestCharacter
@@ -35,6 +56,12 @@ protected:
     // MoveSpeed 어트리뷰트 변경 콜백
     void OnMoveSpeedChanged(const struct FOnAttributeChangeData& InData);
 
+    // 점프 입력 시작 콜백
+    void OnJumpInputStart();
+
+    // 점프 입력 종료 콜백
+    void OnJumpInputCompleted();
+
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     TObjectPtr<USpringArmComponent> SpringArm;
@@ -48,8 +75,11 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
     float MoveThreshold = 10.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability", meta = (DeprecatedProperty, DeprecationMessage = "Use DefaultAbilities"))
     TSubclassOf<UGameplayAbility> DefaultAbilityClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
+    TArray<FDefaultAbilityEntry> DefaultAbilities;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability", meta = (Clamp = "1"))
     int32 DefaultAbilityLevel = 1;
@@ -57,12 +87,22 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
     TObjectPtr<UInputAction> SprintAction;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump")
+    float BaseJumpZVelocity = 420.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+    TObjectPtr<UInputAction> JumpAction;
+
 private:
     UPROPERTY(Transient)
     FGameplayAbilitySpecHandle SprintAbilitySpecHandle;
 
+    UPROPERTY(Transient)
+    FGameplayAbilitySpecHandle JumpAbilitySpecHandle;
+
     FDelegateHandle MoveSpeedChangedDelegateHandle;
 
     static constexpr int32 SPRINT_INPUT_ID = 100;
+    static constexpr int32 JUMP_INPUT_ID = 101;
 
 };

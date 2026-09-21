@@ -18,6 +18,8 @@ UStatAttributeSet::UStatAttributeSet()
 
     InitDamage(0.0f);
     InitStaminaCost(0.0f);
+    InitJumpGauge(0.0f);
+    InitMaxJumpGauge(100.0f);
 }
 
 void UStatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -43,6 +45,10 @@ void UStatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
     else if (Attribute == GetMoveSpeedAttribute())
     {
         NewValue = FMath::Max(0.0f, NewValue);
+    }
+    else if (Attribute == GetJumpGaugeAttribute())
+    {
+        NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxJumpGauge());
     }
 }
 

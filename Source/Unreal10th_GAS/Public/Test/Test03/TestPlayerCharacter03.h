@@ -11,6 +11,9 @@ class UNREAL10TH_GAS_API ATestPlayerCharacter03 : public ATestPlayerCharacter
 {
     GENERATED_BODY()
 
+public:
+    ATestPlayerCharacter03();
+
 protected:
     UFUNCTION(CallInEditor, Category = "GAS|Ability")
     void GiveTestAbility();

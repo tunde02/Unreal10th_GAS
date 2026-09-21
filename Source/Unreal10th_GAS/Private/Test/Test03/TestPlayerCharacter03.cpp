@@ -4,6 +4,29 @@
 #include "Test/Test03/TestPlayerCharacter03.h"
 
 #include "AbilitySystemComponent.h"
+#include "UObject/ConstructorHelpers.h"
+
+ATestPlayerCharacter03::ATestPlayerCharacter03()
+{
+    static ConstructorHelpers::FClassFinder<UGameplayAbility> SprintAbility(
+        TEXT("/Game/Blueprints/GAS/Ability/Sprint/GA_Sprint"));
+    static ConstructorHelpers::FClassFinder<UGameplayAbility> JumpAbility(
+        TEXT("/Game/Blueprints/GAS/Ability/SuperJump/GA_SuperJump"));
+
+    if (SprintAbility.Succeeded())
+    {
+        FDefaultAbilityEntry& Entry = DefaultAbilities.AddDefaulted_GetRef();
+        Entry.AbilityClass = SprintAbility.Class;
+        Entry.Input = EDefaultAbilityInput::Sprint;
+    }
+
+    if (JumpAbility.Succeeded())
+    {
+        FDefaultAbilityEntry& Entry = DefaultAbilities.AddDefaulted_GetRef();
+        Entry.AbilityClass = JumpAbility.Class;
+        Entry.Input = EDefaultAbilityInput::Jump;
+    }
+}
 
 void ATestPlayerCharacter03::GiveTestAbility()
 {
