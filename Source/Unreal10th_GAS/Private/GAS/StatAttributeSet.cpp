@@ -14,6 +14,7 @@ UStatAttributeSet::UStatAttributeSet()
     InitAttackPower(10.0f);
     InitCriticalChance(0.3f);
     InitDefensePower(5.0f);
+    InitMoveSpeed(100.0f);
 
     InitDamage(0.0f);
     InitStaminaCost(0.0f);
@@ -36,6 +37,10 @@ void UStatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
         NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxStamina());
     }
     else if (Attribute == GetDefensePowerAttribute())
+    {
+        NewValue = FMath::Max(0.0f, NewValue);
+    }
+    else if (Attribute == GetMoveSpeedAttribute())
     {
         NewValue = FMath::Max(0.0f, NewValue);
     }

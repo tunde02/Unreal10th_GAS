@@ -3,10 +3,13 @@
 
 #include "Test/TestPlayerCharacter.h"
 #include "Framework/TestGASHUD.h"
+#include "GAS/StatAttributeSet.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "EnhancedInputComponent.h"
+#include "AbilitySystemComponent.h"
 
 ATestPlayerCharacter::ATestPlayerCharacter()
 {
@@ -31,6 +34,19 @@ void ATestPlayerCharacter::PossessedBy(AController* NewController)
 {
     Super::PossessedBy(NewController);
 
+    if (!MoveSpeedChangedDelegateHandle.IsValid())
+    {
+        FOnGameplayAttributeValueChange& MoveSpeedChangedDelegate =
+            AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UStatAttributeSet::GetMoveSpeedAttribute());
+        MoveSpeedChangedDelegateHandle = MoveSpeedChangedDelegate.AddUObject(this, &ATestPlayerCharacter::OnMoveSpeedChanged);
+    }
+
+    if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+    {
+        const float Ratio = (StatAttributeSet ? StatAttributeSet->GetMoveSpeed() : 100.0f) / 100.0f;
+        MovementComp->MaxWalkSpeed = BaseWalkSpeed * Ratio;
+    }
+
     if (APlayerController* PC = Cast<APlayerController>(NewController))
     {
         // 플레이어 일때만 처리
@@ -39,5 +55,80 @@ void ATestPlayerCharacter::PossessedBy(AController* NewController)
             // 초기 실행 순서를 고려하여 안전하게 여기서도 HUD 초기화
             HUD->InitializeHUD(this);
         }
+    }
+
+    GiveDefaultAbilities();
+}
+
+void ATestPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+    if (UEnhancedInputComponent* EnhancedInputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+    {
+        if (SprintAction)
+        {
+            EnhancedInputComp->BindAction(SprintAction, ETriggerEvent::Started, this, &ATestPlayerCharacter::OnSprintInputStart);
+            EnhancedInputComp->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATestPlayerCharacter::OnSprintInputCompleted);
+        }
+    }
+}
+
+void ATestPlayerCharacter::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if (!AbilitySystemComponent) { return; }
+
+    static const FGameplayTag StateMovingTag = FGameplayTag::RequestGameplayTag(FName("GAS.State.Moving"), false);
+    const bool bIsMoving = GetVelocity().SizeSquared2D() >= FMath::Square(MoveThreshold);
+    const bool bHasMovingTag = AbilitySystemComponent->HasMatchingGameplayTag(StateMovingTag);
+
+    if (bIsMoving && !bHasMovingTag)
+    {
+        AbilitySystemComponent->AddLooseGameplayTag(StateMovingTag);
+    }
+    else if (!bIsMoving && bHasMovingTag)
+    {
+        AbilitySystemComponent->RemoveLooseGameplayTag(StateMovingTag);
+    }
+}
+
+void ATestPlayerCharacter::GiveDefaultAbilities()
+{
+    if (!AbilitySystemComponent) { return; }
+    if (!DefaultAbilityClass) { return; }
+
+    if (!AbilitySystemComponent->AbilityActorInfo.IsValid())
+    {
+        AbilitySystemComponent->InitAbilityActorInfo(this, this);
+    }
+
+    FGameplayAbilitySpec Spec(DefaultAbilityClass, DefaultAbilityLevel, SPRINT_INPUT_ID);
+    FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
+}
+
+void ATestPlayerCharacter::OnSprintInputStart()
+{
+    if (AbilitySystemComponent)
+    {
+        AbilitySystemComponent->AbilityLocalInputPressed(SPRINT_INPUT_ID);
+    }
+}
+
+void ATestPlayerCharacter::OnSprintInputCompleted()
+{
+    if (AbilitySystemComponent)
+    {
+        AbilitySystemComponent->AbilityLocalInputReleased(SPRINT_INPUT_ID);
+    }
+}
+
+void ATestPlayerCharacter::OnMoveSpeedChanged(const FOnAttributeChangeData& InData)
+{
+    if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+    {
+        const float Ratio = InData.NewValue / 100.0f;
+        MovementComp->MaxWalkSpeed = BaseWalkSpeed * Ratio;
     }
 }

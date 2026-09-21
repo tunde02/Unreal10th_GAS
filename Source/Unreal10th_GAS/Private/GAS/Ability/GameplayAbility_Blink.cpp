@@ -23,7 +23,7 @@ void UGameplayAbility_Blink::ActivateAbility(
 {
     if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
     {
-        EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+        EndAbility(Handle, ActorInfo, ActivationInfo, true, /* bWasCancelled */ true);
         return;
     }
 
@@ -49,6 +49,70 @@ void UGameplayAbility_Blink::ActivateAbility(
     }
 
     EndAbility(Handle, ActorInfo, ActivationInfo, true, /* bWasCancelled */ false);
+}
+
+bool UGameplayAbility_Blink::CheckCost(
+    const FGameplayAbilitySpecHandle Handle,
+    const FGameplayAbilityActorInfo* ActorInfo,
+    OUT FGameplayTagContainer* OptionalRelevantTags) const
+{
+    UGameplayEffect* CostGE = GetCostGameplayEffect();
+    if (!CostGE) { return true; }
+
+    UAbilitySystemComponent* ASC = ActorInfo ? ActorInfo->AbilitySystemComponent.Get() : nullptr;
+    if (!ASC) { return false; }
+
+    if (!ASC->HasAttributeSetForAttribute(UStatAttributeSet::GetStaminaAttribute())
+        || !ASC->HasAttributeSetForAttribute(UStatAttributeSet::GetStaminaCostAttribute()))
+    {
+        return false;
+    }
+
+    // 시전자의 현재 Stamina값 가져오기
+    const float CurrentStamina = ASC->GetNumericAttribute(UStatAttributeSet::GetStaminaAttribute());
+
+    // 필요 소모량을 알기 위해 Spec 생성 및 모디파이어 계산
+    const FGameplayEffectContextHandle EffectContext = MakeEffectContext(Handle, ActorInfo);
+    const float AbilityLevel = GetAbilityLevel(Handle, ActorInfo);
+    FGameplayEffectSpec Spec(CostGE, EffectContext, AbilityLevel);
+    Spec.CalculateModifierMagnitudes();
+
+    // 현재 효과에서 StaminaCost 변경시키는 모디파이어를 전부 불러와서 적용 후 값 갱신
+    float StaminaCost = 0.0f;
+    bool bFoundStaminaModifier = false;
+    for (int32 ModIndex = 0; ModIndex < Spec.Modifiers.Num(); ModIndex++)
+    {
+        if (Spec.Def && Spec.Def->Modifiers.IsValidIndex(ModIndex))
+        {
+            const FGameplayModifierInfo& ModDef = Spec.Def->Modifiers[ModIndex];
+            if (ModDef.Attribute == UStatAttributeSet::GetStaminaCostAttribute())
+            {
+                const FModifierSpec& ModSpec = Spec.Modifiers[ModIndex];
+                StaminaCost += ModSpec.GetEvaluatedMagnitude();
+                bFoundStaminaModifier = true;
+            }
+        }
+    }
+
+    // 현재 효과에 StaminaCost 관련 모디파이어가 없으면 원래 함수 실행
+    if (!bFoundStaminaModifier)
+    {
+        return Super::CheckCost(Handle, ActorInfo, OptionalRelevantTags);
+    }
+
+    if (StaminaCost <= CurrentStamina)
+    {
+        return true;
+    }
+
+    // 실패 원인인 코스트 부족 태그를 OptionalRelevantTags에 추가
+    const FGameplayTag& CostTag = UAbilitySystemGlobals::Get().ActivateFailCostTag;
+    if (OptionalRelevantTags && CostTag.IsValid())
+    {
+        OptionalRelevantTags->AddTag(CostTag);
+    }
+
+    return false;
 }
 
 FVector UGameplayAbility_Blink::CalculateBlinkDestination(const ACharacter* InCharacter, float InDistance) const

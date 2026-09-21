@@ -20,6 +20,11 @@ public:
         const FGameplayAbilityActivationInfo ActivationInfo,
         const FGameplayEventData* TriggerEventData) override;
 
+    virtual bool CheckCost(
+        const FGameplayAbilitySpecHandle Handle,
+        const FGameplayAbilityActorInfo* ActorInfo,
+        OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
+
 protected:
     virtual FVector CalculateBlinkDestination(const ACharacter* InCharacter, float InDistance) const;
 

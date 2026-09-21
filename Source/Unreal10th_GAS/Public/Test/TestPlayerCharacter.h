@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Test/TestCharacter.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "TestPlayerCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
+class UInputAction;
 
 UCLASS()
 class UNREAL10TH_GAS_API ATestPlayerCharacter : public ATestCharacter
@@ -19,6 +21,19 @@ public:
 
 protected:
     virtual void PossessedBy(AController* NewController) override;
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+    virtual void Tick(float DeltaTime) override;
+
+    virtual void GiveDefaultAbilities();
+
+    // 스프린트 입력 시작 콜백
+    void OnSprintInputStart();
+
+    // 스프린트 입력 종료 콜백
+    void OnSprintInputCompleted();
+
+    // MoveSpeed 어트리뷰트 변경 콜백
+    void OnMoveSpeedChanged(const struct FOnAttributeChangeData& InData);
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -26,5 +41,28 @@ protected:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     TObjectPtr<UCameraComponent> FollowCamera;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+    float BaseWalkSpeed = 600.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+    float MoveThreshold = 10.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
+    TSubclassOf<UGameplayAbility> DefaultAbilityClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability", meta = (Clamp = "1"))
+    int32 DefaultAbilityLevel = 1;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+    TObjectPtr<UInputAction> SprintAction;
+
+private:
+    UPROPERTY(Transient)
+    FGameplayAbilitySpecHandle SprintAbilitySpecHandle;
+
+    FDelegateHandle MoveSpeedChangedDelegateHandle;
+
+    static constexpr int32 SPRINT_INPUT_ID = 100;
 
 };
