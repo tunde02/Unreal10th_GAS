@@ -16,7 +16,7 @@ class UNREAL10TH_GAS_API ATest04 : public ATestBaseActor
 public:
     virtual void OnConstruction(const FTransform& Transform) override;
 
-    UFUNCTION(CallinEditor, Category = "GAS")
+    UFUNCTION(BlueprintCallable, CallinEditor, Category = "GAS")
     void TestScanAndHit();
 
     UFUNCTION(CallinEditor, Category = "GAS")
