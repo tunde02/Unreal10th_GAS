@@ -97,7 +97,7 @@ void UStatAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
         if (LocalStaminaCost > 0)
         {
             float FinalStaminaCost = LocalStaminaCost;
-            FinalStaminaCost = FMath::Max(1.0f, FinalStaminaCost);
+            FinalStaminaCost = FMath::Max(0.0f, FinalStaminaCost);
 
             const float NewStamina = FMath::Clamp(GetStamina() - FinalStaminaCost, 0.0f, GetMaxStamina());
             SetStamina(NewStamina);

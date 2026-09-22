@@ -23,6 +23,7 @@ protected:
     virtual void PossessedBy(AController* NewController) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
     virtual void Tick(float DeltaTime) override;
+    virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
 
     virtual void GiveDefaultAbilities();
 
@@ -31,6 +32,12 @@ protected:
 
     // 스프린트 입력 종료 콜백
     void OnSprintInputCompleted();
+
+    // 차지 점프 입력 시작 콜백
+    void OnChargeJumpInputStart();
+
+    // 차지 점프 입력 종료 콜백
+    void OnChargeJumpInputCompleted();
 
     // MoveSpeed 어트리뷰트 변경 콜백
     void OnMoveSpeedChanged(const struct FOnAttributeChangeData& InData);
@@ -51,18 +58,28 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
     TSubclassOf<UGameplayAbility> DefaultAbilityClass;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
+    TSubclassOf<UGameplayAbility> DefaultJumpAbilityClass;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability", meta = (Clamp = "1"))
     int32 DefaultAbilityLevel = 1;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
     TObjectPtr<UInputAction> SprintAction;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+    TObjectPtr<UInputAction> ChargeJumpAction;
+
 private:
     UPROPERTY(Transient)
     FGameplayAbilitySpecHandle SprintAbilitySpecHandle;
 
+    UPROPERTY(Transient)
+    FGameplayAbilitySpecHandle JumpAbilitySpecHandle;
+
     FDelegateHandle MoveSpeedChangedDelegateHandle;
 
-    static constexpr int32 SPRINT_INPUT_ID = 100;
+    static constexpr int32 SprintInputId = 100;
+    static constexpr int32 ChargeJumpInputId = 101;
 
 };

@@ -47,6 +47,25 @@ void ATestPlayerCharacter::PossessedBy(AController* NewController)
         MovementComp->MaxWalkSpeed = BaseWalkSpeed * Ratio;
     }
 
+    static const FGameplayTag GroundedTag = FGameplayTag::RequestGameplayTag(FName("GAS.State.Grounded"), false);
+    if (GroundedTag.IsValid())
+    {
+        if (GetCharacterMovement()->IsMovingOnGround())
+        {
+            if (!AbilitySystemComponent->HasMatchingGameplayTag(GroundedTag))
+            {
+                AbilitySystemComponent->AddLooseGameplayTag(GroundedTag);
+            }
+        }
+        else
+        {
+            if (AbilitySystemComponent->HasMatchingGameplayTag(GroundedTag))
+            {
+                AbilitySystemComponent->RemoveLooseGameplayTag(GroundedTag);
+            }
+        }
+    }
+
     if (APlayerController* PC = Cast<APlayerController>(NewController))
     {
         // 플레이어 일때만 처리
@@ -71,6 +90,12 @@ void ATestPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
             EnhancedInputComp->BindAction(SprintAction, ETriggerEvent::Started, this, &ATestPlayerCharacter::OnSprintInputStart);
             EnhancedInputComp->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATestPlayerCharacter::OnSprintInputCompleted);
         }
+
+        if (ChargeJumpAction)
+        {
+            EnhancedInputComp->BindAction(ChargeJumpAction, ETriggerEvent::Started, this, &ATestPlayerCharacter::OnChargeJumpInputStart);
+            EnhancedInputComp->BindAction(ChargeJumpAction, ETriggerEvent::Completed, this, &ATestPlayerCharacter::OnChargeJumpInputCompleted);
+        }
     }
 }
 
@@ -94,25 +119,58 @@ void ATestPlayerCharacter::Tick(float DeltaTime)
     }
 }
 
+void ATestPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+    Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+
+    if (!AbilitySystemComponent) { return; }
+
+    static const FGameplayTag GroundedTag = FGameplayTag::RequestGameplayTag(FName("GAS.State.Grounded"), false);
+    if (!GroundedTag.IsValid()) { return; }
+
+    if (GetCharacterMovement()->IsMovingOnGround())
+    {
+        if (!AbilitySystemComponent->HasMatchingGameplayTag(GroundedTag))
+        {
+            AbilitySystemComponent->AddLooseGameplayTag(GroundedTag);
+        }
+    }
+    else
+    {
+        if (AbilitySystemComponent->HasMatchingGameplayTag(GroundedTag))
+        {
+            AbilitySystemComponent->RemoveLooseGameplayTag(GroundedTag);
+        }
+    }
+}
+
 void ATestPlayerCharacter::GiveDefaultAbilities()
 {
     if (!AbilitySystemComponent) { return; }
-    if (!DefaultAbilityClass) { return; }
 
     if (!AbilitySystemComponent->AbilityActorInfo.IsValid())
     {
         AbilitySystemComponent->InitAbilityActorInfo(this, this);
     }
 
-    FGameplayAbilitySpec Spec(DefaultAbilityClass, DefaultAbilityLevel, SPRINT_INPUT_ID);
-    FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
+    if (DefaultAbilityClass)
+    {
+        FGameplayAbilitySpec Spec(DefaultAbilityClass, DefaultAbilityLevel, SprintInputId);
+        SprintAbilitySpecHandle = AbilitySystemComponent->GiveAbility(Spec);
+    }
+
+    if (DefaultJumpAbilityClass)
+    {
+        FGameplayAbilitySpec Spec(DefaultJumpAbilityClass, DefaultAbilityLevel, ChargeJumpInputId);
+        JumpAbilitySpecHandle = AbilitySystemComponent->GiveAbility(Spec);
+    }
 }
 
 void ATestPlayerCharacter::OnSprintInputStart()
 {
     if (AbilitySystemComponent)
     {
-        AbilitySystemComponent->AbilityLocalInputPressed(SPRINT_INPUT_ID);
+        AbilitySystemComponent->AbilityLocalInputPressed(SprintInputId);
     }
 }
 
@@ -120,7 +178,23 @@ void ATestPlayerCharacter::OnSprintInputCompleted()
 {
     if (AbilitySystemComponent)
     {
-        AbilitySystemComponent->AbilityLocalInputReleased(SPRINT_INPUT_ID);
+        AbilitySystemComponent->AbilityLocalInputReleased(SprintInputId);
+    }
+}
+
+void ATestPlayerCharacter::OnChargeJumpInputStart()
+{
+    if (AbilitySystemComponent)
+    {
+        AbilitySystemComponent->AbilityLocalInputPressed(ChargeJumpInputId);
+    }
+}
+
+void ATestPlayerCharacter::OnChargeJumpInputCompleted()
+{
+    if (AbilitySystemComponent)
+    {
+        AbilitySystemComponent->AbilityLocalInputReleased(ChargeJumpInputId);
     }
 }
 
