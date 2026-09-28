@@ -18,11 +18,11 @@ class UNREAL10TH_GAS_API UOverHeadWidget : public UUserWidget
 public:
     UFUNCTION(BlueprintCallable)
     virtual void InitializeWithAbilitySystem(AActor* InActor);
+    virtual void UpdateHealthUI(float InCurrent, float InMax);
 
 protected:
     virtual void OnHealthChanged(const FOnAttributeChangeData& InData);
     virtual void OnMaxHealthChanged(const FOnAttributeChangeData& InData);
-    virtual void UpdateHealthUI(float InCurrent, float InMax);
 
     // C++에서는 선언만 하고, 블루프린트에서 내부를 구현할 수 있음
     UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnHealthChanged"))
