@@ -39,6 +39,8 @@ protected:
 
     void UpdateOverHeadWidgetRotation();
 
+    void SetHealth(float NewHealth);
+
 private:
     UFUNCTION()
     void Test1();
@@ -48,6 +50,8 @@ private:
 
     UFUNCTION()
     void Test3();
+
+    void RefreshHealthUI();
 
 protected:
     // Level이 리플리케이션 될 때 OnRepNotify_Level 함수가 실행됨
@@ -59,6 +63,9 @@ protected:
 
     UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRepNotify_Health)
     float Health = 100.0f;
+
+    UPROPERTY(VisibleAnywhere, Replicated)
+    float MaxHealth = 100.0f;
 
     UPROPERTY(EditDefaultsOnly, Category = "Input")
 
