@@ -10,6 +10,8 @@ class UInputMappingContext;
 class UInputAction;
 class UWidgetComponent;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float);
+
 UCLASS()
 class UNREAL10TH_GAS_API ANetTestCharacter02_Replication : public ATestPlayerCharacter03
 {
@@ -34,9 +36,6 @@ protected:
     UFUNCTION(CallInEditor, Category = "Test")
     void TestLevelUp();
 
-    UFUNCTION(BlueprintCallable)
-    void InitializeOverHeadWidget();
-
     void UpdateOverHeadWidgetRotation();
 
     void SetHealth(float NewHealth);
@@ -51,7 +50,8 @@ private:
     UFUNCTION()
     void Test3();
 
-    void RefreshHealthUI();
+public:
+    FOnHealthChanged OnHealthChanged;
 
 protected:
     // Level이 리플리케이션 될 때 OnRepNotify_Level 함수가 실행됨

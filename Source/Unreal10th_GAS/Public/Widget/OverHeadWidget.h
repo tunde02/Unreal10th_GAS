@@ -19,6 +19,8 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual void InitializeWithAbilitySystem(AActor* InActor);
     virtual void UpdateHealthUI(float InCurrent, float InMax);
+    virtual void OnHealthChanged(const float InHealth);
+    virtual void OnMaxHealthChanged(const float InMaxHealth);
 
 protected:
     virtual void OnHealthChanged(const FOnAttributeChangeData& InData);

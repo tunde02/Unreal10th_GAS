@@ -58,6 +58,18 @@ void UOverHeadWidget::OnMaxHealthChanged(const FOnAttributeChangeData& InData)
     UpdateHealthUI(CurrentHealth, MaxHealth);
 }
 
+void UOverHeadWidget::OnHealthChanged(const float InHealth)
+{
+    CurrentHealth = InHealth;
+    UpdateHealthUI(CurrentHealth, MaxHealth);
+}
+
+void UOverHeadWidget::OnMaxHealthChanged(const float InMaxHealth)
+{
+    MaxHealth = InMaxHealth;
+    UpdateHealthUI(CurrentHealth, MaxHealth);
+}
+
 void UOverHeadWidget::UpdateHealthUI(float InCurrent, float InMax)
 {
     if (HealthProgressBar)
