@@ -2,6 +2,7 @@
 
 
 #include "Test/NetTest03/NetTestCharacter03_RPC.h"
+#include "Test/DamagePopupActor.h"
 
 #include "NiagaraFunctionLibrary.h"
 
@@ -34,7 +35,7 @@ void ANetTestCharacter03_RPC::OnTakeDamage(
         OnRepNotify_Health();
 
         // 맞은 클라이언트가 맞은 효과를 보여주도록 시키기
-        Client_OnHit();
+        Client_OnHit(Damage);
     }
 }
 
@@ -56,22 +57,36 @@ void ANetTestCharacter03_RPC::Server_Fire_Implementation()
     }
 }
 
-void ANetTestCharacter03_RPC::Client_OnHit_Implementation()
+void ANetTestCharacter03_RPC::Client_OnHit_Implementation(float InDamage)
 {
     if (APlayerController* PC = Cast<APlayerController>(GetController()))
     {
         PC->ClientStartCameraShake(CameraShakeClass);
     }
 
-    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-        GetWorld(),
-        HitVFX,
-        GetActorLocation() + FVector::UpVector * 100.0f,
-        FRotator::ZeroRotator,
-        FVector::OneVector,
-        true,
-        true,
-        ENCPoolMethod::AutoRelease);
+    //UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+    //    GetWorld(),
+    //    HitVFX,
+    //    GetActorLocation() + FVector::UpVector * 100.0f,
+    //    FRotator::ZeroRotator,
+    //    FVector::OneVector,
+    //    true,
+    //    true,
+    //    ENCPoolMethod::AutoRelease);
+
+    const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 120.f);
+
+    ADamagePopupActor* Popup =
+        GetWorld()->SpawnActor<ADamagePopupActor>(
+            DamagePopupClass,
+            SpawnLocation,
+            FRotator::ZeroRotator
+        );
+
+    if (Popup)
+    {
+        Popup->Initialize(InDamage);
+    }
 }
 
 void ANetTestCharacter03_RPC::Fire()
