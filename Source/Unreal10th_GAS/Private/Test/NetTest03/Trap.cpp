@@ -14,6 +14,8 @@ ATrap::ATrap()
 {
     PrimaryActorTick.bCanEverTick = true;
 
+    bReplicates = true;
+
     Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
     SetRootComponent(Mesh);
 
@@ -37,6 +39,9 @@ void ATrap::BeginPlay()
 
 void ATrap::HandleOnActorBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
+    if (!HasAuthority())
+        return;
+
     if (OtherActor != this
         && OtherActor->IsA<ACharacter>())
     {
@@ -57,6 +62,9 @@ void ATrap::HandleOnActorBeginOverlap(AActor* OverlappedActor, AActor* OtherActo
 
 void ATrap::HandleOnActorEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
+    if (!HasAuthority())
+        return;
+
     OverlappingActors.Remove(OtherActor);
 
     if (OverlappingActors.IsEmpty())
@@ -67,6 +75,9 @@ void ATrap::HandleOnActorEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
 
 void ATrap::ApplyDamage()
 {
+    if (!HasAuthority())
+        return;
+
     for (auto Target : OverlappingActors)
     {
         UGameplayStatics::ApplyDamage(Target.Get(), Damage, GetInstigatorController(), this, UDamageType::StaticClass());
