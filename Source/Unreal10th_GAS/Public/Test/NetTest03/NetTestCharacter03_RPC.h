@@ -8,6 +8,7 @@
 
 class UCameraShakeBase;
 class UNiagaraSystem;
+class ADamagePopupActor;
 
 UCLASS()
 class UNREAL10TH_GAS_API ANetTestCharacter03_RPC : public ANetTestCharacter02_Replication
@@ -36,7 +37,7 @@ protected:
     // 특정 클라이언트가 발사체를 맞았을 때
     // 그 클라이언트 전용 효과를 재생하는 함수
     UFUNCTION(Client, Unreliable)
-    void Client_OnHit();
+    void Client_OnHit(float InDamage);
 
 private:
     // 실제로 발사체를 발사하는 함수
@@ -51,5 +52,8 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test|RPC")
     TObjectPtr<UNiagaraSystem> HitVFX;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test|RPC")
+    TSubclassOf<ADamagePopupActor> DamagePopupClass;
 
 };
