@@ -7,6 +7,7 @@
 #include "TestPlayerState.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnNameChanged, const FString&)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnScoreChanged, int32)
 
 UCLASS()
 class UNREAL10TH_GAS_API ATestPlayerState : public APlayerState
@@ -34,12 +35,13 @@ protected:
 
 public:
     FOnNameChanged OnNameChanged;
+    FOnScoreChanged OnScoreChanged;
 
 protected:
     UPROPERTY(ReplicatedUsing = OnRepNotify_MyPlayerScore, BlueprintReadOnly, Category = "Data")
     int32 MyPlayerScore = 0;
 
     UPROPERTY(ReplicatedUsing = OnRepNotify_MyPlayerName, BlueprintReadOnly, Category = "Data")
-    FString MyPlayerName;
+    FString MyPlayerName = TEXT("플레이어");
 
 };

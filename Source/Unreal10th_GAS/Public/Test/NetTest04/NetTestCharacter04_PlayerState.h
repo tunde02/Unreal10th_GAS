@@ -12,9 +12,22 @@ class UNREAL10TH_GAS_API ANetTestCharacter04_PlayerState : public ANetTestCharac
     GENERATED_BODY()
 
 public:
+    ANetTestCharacter04_PlayerState();
+
     virtual void OnRep_PlayerState() override;
 
 protected:
+    virtual void BeginPlay() override;
     virtual void PossessedBy(AController* NewController) override;
+    virtual void Tick(float DeltaTime) override;
+
+    void UpdatePlayerNameWidgetRotation();
+
+    void InitializeLocalHUD();
+    void InitializePlayerNameWidget();
+
+protected:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI|OverHead")
+    TObjectPtr<UWidgetComponent> PlayerNameWidgetComponent;
 
 };

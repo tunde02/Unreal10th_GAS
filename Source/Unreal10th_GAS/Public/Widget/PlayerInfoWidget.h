@@ -19,6 +19,7 @@ public:
 
 protected:
     void UpdatePlayerName(const FString& InName);
+    void UpdatePlayerScore(int32 InScore);
 
 protected:
     UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

@@ -56,7 +56,7 @@ void ATestPlayerState::Server_SetMyPlayerName_Implementation(const FString& InNe
 
 void ATestPlayerState::OnRepNotify_MyPlayerScore()
 {
-    //
+    OnScoreChanged.Broadcast(MyPlayerScore);
 }
 
 void ATestPlayerState::OnRepNotify_MyPlayerName()
