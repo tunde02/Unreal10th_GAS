@@ -45,11 +45,11 @@ void ANetTestCharacter02_Replication::Tick(float DeltaTime)
     }
 }
 
-void ANetTestCharacter02_Replication::PossessedBy(AController* NewController)
+void ANetTestCharacter02_Replication::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-    Super::PossessedBy(NewController);
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-    if (APlayerController* PC = Cast<APlayerController>(NewController))
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
         {
@@ -59,11 +59,6 @@ void ANetTestCharacter02_Replication::PossessedBy(AController* NewController)
             }
         }
     }
-}
-
-void ANetTestCharacter02_Replication::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-    Super::SetupPlayerInputComponent(PlayerInputComponent);
 
     if (UEnhancedInputComponent* EnhancedInputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent))
     {

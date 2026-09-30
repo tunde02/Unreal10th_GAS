@@ -3,6 +3,7 @@
 
 #include "Framework/TestGASHUD.h"
 #include "Widget/HUDWidget.h"
+#include "Framework/TestPlayerState.h"
 
 #include "Blueprint/UserWidget.h"
 
@@ -33,6 +34,14 @@ void ATestGASHUD::InitializeHUD(APawn* InPawn)
             HUDWidgetInstance->InitializeWithAbilitySystem(InPawn);
         }
     }
+}
+
+void ATestGASHUD::InitializeNetHUD(ATestPlayerState* InPS)
+{
+    // 반드시 InitializeHUD() 이후에 실행되어야 한다
+    if (!HUDWidgetInstance) { return; }
+
+    HUDWidgetInstance->InitializePlayerInfo(InPS);
 }
 
 void ATestGASHUD::BeginPlay()
